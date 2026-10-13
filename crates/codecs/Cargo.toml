@@ -1,0 +1,48 @@
+[package]
+name = "novafilm-codecs"
+description = "Container + codec hub: MP4/MOV, Matroska, MXF, Ogg and MPEG TS/PS sources, image sequences, GOP-aware seeking, decoder registry, audio decoding"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novafilm-time = { workspace = true }
+novafilm-color = { workspace = true }
+novafilm-frame = { workspace = true }
+novafilm-media = { workspace = true }
+novafilm-avi = { workspace = true }
+novafilm-isobmff = { workspace = true }
+novafilm-matroska = { workspace = true }
+novafilm-mxf = { workspace = true }
+novafilm-mpegts = { workspace = true }
+novafilm-mpeg2v = { workspace = true }
+novafilm-ac3 = { workspace = true }
+novafilm-mpa = { workspace = true }
+novafilm-ogg = { workspace = true }
+novafilm-bitstream = { workspace = true }
+novafilm-h264 = { workspace = true }
+novafilm-hevc = { workspace = true }
+novafilm-vp8 = { workspace = true }
+novafilm-vp9 = { workspace = true }
+novafilm-prores = { workspace = true }
+novafilm-dnx = { workspace = true }
+novafilm-av1 = { workspace = true }
+novafilm-apv = { workspace = true }
+novafilm-aac = { workspace = true }
+novafilm-opus = { workspace = true }
+rayon = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+# Decode timing counters (`gop_stats`); std's Instant panics on wasm32.
+web-time = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+# Bootstrap audio decoding (MPL-2.0, used unmodified); replaced by own decoders over time.
+symphonia = { version = "0.5.5", default-features = false, features = ["aac", "mp1", "mp2", "mp3", "flac", "alac", "pcm", "wav", "aiff", "ogg", "vorbis", "isomp4"] }
+
+[dev-dependencies]
+novafilm-testkit = { workspace = true }
+serde_json = { workspace = true }

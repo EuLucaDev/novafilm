@@ -1,0 +1,17 @@
+[package]
+name = "novafilm-mpa"
+description = "Clean-room MPEG-1/2 Audio Layer I and Layer II (MP1 / MP2) decoder"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novafilm-bitstream = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+novafilm-testkit = { workspace = true }

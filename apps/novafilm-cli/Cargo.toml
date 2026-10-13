@@ -1,0 +1,38 @@
+[package]
+name = "novafilm-cli"
+description = "NovaFilm headless CLI and MCP server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "novafilm-cli"
+path = "src/main.rs"
+
+[features]
+default = []
+# Speech-to-text (Text panel ▸ Transcribe) with Whisper on the CPU, and model downloads.
+whisper = ["novafilm-engine/whisper", "novafilm-engine/speech-download"]
+
+[dependencies]
+novafilm-engine = { workspace = true }
+novafilm-export = { workspace = true }
+novafilm-project = { workspace = true }
+novafilm-render = { workspace = true }
+novafilm-time = { workspace = true }
+novafilm-gpu = { workspace = true }
+novafilm-media = { workspace = true }
+novafilm-codecs = { workspace = true }
+novafilm-platform = { workspace = true }
+novafilm-mxf = { workspace = true }
+novafilm-mpegts = { workspace = true }
+novafilm-ogg = { workspace = true }
+novafilm-automation = { workspace = true }
+serde_json = { workspace = true }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[dev-dependencies]
+novafilm-testkit = { workspace = true }

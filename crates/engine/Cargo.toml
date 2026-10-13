@@ -1,0 +1,51 @@
+[package]
+name = "novafilm-engine"
+description = "NovaFilm engine façade: session, command registry, history, media pool"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = []
+# Speech-to-text with Whisper (candle, CPU). Off by default and in wasm builds.
+whisper = ["novafilm-speech/whisper"]
+# Speech-model downloads over HTTPS.
+speech-download = ["novafilm-speech/download"]
+# Natural voices for Text to Speech: Kokoro-82M on candle (CPU) and their download.
+neural-voices = ["novafilm-tts/kokoro", "speech-download"]
+
+[dependencies]
+novafilm-time = { workspace = true }
+novafilm-geom = { workspace = true }
+novafilm-color = { workspace = true }
+novafilm-frame = { workspace = true }
+novafilm-media = { workspace = true }
+novafilm-codecs = { workspace = true }
+novafilm-project = { workspace = true }
+novafilm-edit = { workspace = true }
+novafilm-render = { workspace = true }
+novafilm-scopes = { workspace = true }
+novafilm-text = { workspace = true }
+novafilm-audio-dsp = { workspace = true }
+novafilm-export = { workspace = true }
+novafilm-mxf = { workspace = true }
+novafilm-format = { workspace = true }
+novafilm-interchange = { workspace = true }
+novafilm-captions = { workspace = true }
+novafilm-speech = { workspace = true }
+novafilm-tts = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+web-time = "1"
+
+[dev-dependencies]
+novafilm-testkit = { workspace = true }
+novafilm-dng = { workspace = true, features = ["writer"] }
+novafilm-isobmff = { workspace = true }
+image = { version = "0.25", default-features = false, features = ["png", "gif"] }

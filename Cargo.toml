@@ -1,0 +1,148 @@
+[workspace]
+exclude = ["vendor"]
+resolver = "3"
+members = ["crates/*", "apps/*", "xtask"]
+default-members = ["crates/*", "apps/*", "xtask"]
+
+[workspace.package]
+version = "0.7.2"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+rust-version = "1.95"
+repository = "https://github.com/EuLucaDev/novafilm"
+
+[workspace.dependencies]
+# internal
+novafilm-time = { path = "crates/time" }
+novafilm-geom = { path = "crates/geom" }
+novafilm-color = { path = "crates/color" }
+novafilm-bitstream = { path = "crates/bitstream" }
+novafilm-isobmff = { path = "crates/isobmff" }
+novafilm-avi = { path = "crates/avi" }
+novafilm-matroska = { path = "crates/matroska" }
+novafilm-mxf = { path = "crates/mxf" }
+novafilm-cfb = { path = "crates/cfb" }
+novafilm-mpegts = { path = "crates/mpegts" }
+novafilm-mpeg2v = { path = "crates/mpeg2v" }
+novafilm-ac3 = { path = "crates/ac3" }
+novafilm-mpa = { path = "crates/mpa" }
+novafilm-ogg = { path = "crates/ogg" }
+novafilm-h264 = { path = "crates/h264" }
+novafilm-hevc = { path = "crates/hevc" }
+novafilm-vp8 = { path = "crates/vp8" }
+novafilm-vp9 = { path = "crates/vp9" }
+novafilm-prores = { path = "crates/prores" }
+novafilm-dnx = { path = "crates/dnx" }
+novafilm-apv = { path = "crates/apv" }
+novafilm-dng = { path = "crates/dng" }
+novafilm-av1 = { path = "crates/av1" }
+novafilm-aac = { path = "crates/aac" }
+novafilm-flac = { path = "crates/flac" }
+novafilm-opus = { path = "crates/opus" }
+novafilm-h264enc = { path = "crates/h264enc" }
+novafilm-audio-dsp = { path = "crates/audio-dsp" }
+novafilm-frame = { path = "crates/frame" }
+novafilm-media = { path = "crates/media" }
+novafilm-codecs = { path = "crates/codecs" }
+novafilm-project = { path = "crates/project" }
+novafilm-edit = { path = "crates/edit" }
+novafilm-interchange = { path = "crates/interchange" }
+novafilm-text = { path = "crates/text" }
+novafilm-captions = { path = "crates/captions" }
+novafilm-speech = { path = "crates/speech" }
+novafilm-tts = { path = "crates/tts" }
+novafilm-tts-text = { path = "crates/tts-text" }
+novafilm-render = { path = "crates/render" }
+novafilm-gpu = { path = "crates/gpu" }
+novafilm-scopes = { path = "crates/scopes" }
+novafilm-export = { path = "crates/export" }
+novafilm-format = { path = "crates/format" }
+novafilm-engine = { path = "crates/engine" }
+novafilm-ui-egui = { path = "crates/ui-egui" }
+novafilm-automation = { path = "crates/automation" }
+novafilm-platform = { path = "crates/platform" }
+novafilm-testkit = { path = "crates/testkit" }
+
+# foundation
+thiserror = "2"
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = "1"
+log = "0.4"
+rayon = "1"
+proptest = "1"
+roxmltree = "0.21"
+
+# ui
+# Shared frontend components; keep this dependency above the engine boundary.
+nova-ui = { path = "vendor/novafoods-libs-5c874d51ee/crates/ui", features = ["serde"] }
+egui = "0.36"
+eframe = { version = "0.36", default-features = false }
+egui_kittest = "0.36"
+rfd = "0.17"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+dbg_macro = "warn"
+todo = "warn"
+too_many_arguments = "allow"
+needless_range_loop = "allow"
+type_complexity = "allow"
+
+[profile.dev.package."*"]
+opt-level = 2
+
+[profile.dev]
+opt-level = 1
+
+# Codec hot loops: debug-build tests (RFC/oracle vectors) are minutes slower below opt-level 3.
+[profile.dev.package.novafilm-h264]
+opt-level = 3
+
+[profile.dev.package.novafilm-h264enc]
+opt-level = 3
+
+[profile.dev.package.novafilm-hevc]
+opt-level = 3
+
+[profile.dev.package.novafilm-prores]
+opt-level = 3
+
+[profile.dev.package.novafilm-dnx]
+opt-level = 3
+
+[profile.dev.package.novafilm-apv]
+opt-level = 3
+
+[profile.dev.package.novafilm-dng]
+opt-level = 3
+
+[profile.dev.package.novafilm-av1]
+opt-level = 3
+
+[profile.dev.package.novafilm-aac]
+opt-level = 3
+
+[profile.dev.package.novafilm-flac]
+opt-level = 3
+
+# Audio effects: realtime-factor tests and long convolution / spectral runs.
+[profile.dev.package.novafilm-audio-dsp]
+opt-level = 3
+
+[profile.dev.package.novafilm-mxf]
+opt-level = 3
+
+[profile.dev.package.novafilm-opus]
+opt-level = 3
+
+[profile.dev.package.novafilm-vp8]
+opt-level = 3
+
+[profile.dev.package.novafilm-vp9]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

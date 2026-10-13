@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "novafilm": {
+      "command": "target/release/novafilm-cli",
+      "args": ["mcp", "--bridge", "127.0.0.1:9876"]
+    },
+    "novafilm-headless": {
+      "command": "target/release/novafilm-cli",
+      "args": ["mcp", "--demo"]
+    }
+  }
+}

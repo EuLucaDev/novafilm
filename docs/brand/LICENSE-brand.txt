@@ -1,0 +1,5 @@
+Nova Foods brand assets: license
+
+The Nova Foods name, logo and cube mark in this directory are trademarks of Nova Foods.
+They are not open source and are not covered by the code's MIT OR Apache-2.0 license.
+They may be used only as part of official Nova Foods builds.

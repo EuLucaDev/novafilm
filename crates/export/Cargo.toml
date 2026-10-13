@@ -1,0 +1,39 @@
+[package]
+name = "novafilm-export"
+description = "Export pipeline: parallel render → encode → mux, presets, progress/cancel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novafilm-time = { workspace = true }
+novafilm-frame = { workspace = true }
+novafilm-color = { workspace = true }
+novafilm-media = { workspace = true }
+novafilm-project = { workspace = true }
+novafilm-render = { workspace = true }
+novafilm-audio-dsp = { workspace = true }
+novafilm-geom = { workspace = true }
+novafilm-text = { workspace = true }
+novafilm-isobmff = { workspace = true }
+novafilm-prores = { workspace = true }
+novafilm-dnx = { workspace = true }
+novafilm-apv = { workspace = true }
+novafilm-mxf = { workspace = true }
+novafilm-aac = { workspace = true }
+novafilm-flac = { workspace = true }
+novafilm-h264enc = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+rayon = { workspace = true }
+web-time = "1"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "tiff", "bmp"] }
+
+[dev-dependencies]
+novafilm-testkit = { workspace = true }
+novafilm-codecs = { workspace = true }

@@ -1,0 +1,11 @@
+kind = "app"
+categories = ["AudioVideo", "Video", "AudioVideoEditing"]
+icon = "assets/app-icon/hicolor/256x256/apps/br.com.novafoods.novafilm.png"
+
+[linux.x86_64]
+asset = "novafilm-{version}-linux-x86_64.tar.gz"
+exec = "novafilm-{version}-linux-x86_64/bin/novafilm"
+
+[linux.aarch64]
+asset = "novafilm-{version}-linux-aarch64.tar.gz"
+exec = "novafilm-{version}-linux-aarch64/bin/novafilm"

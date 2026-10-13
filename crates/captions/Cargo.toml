@@ -1,0 +1,21 @@
+[package]
+name = "novafilm-captions"
+description = "NovaFilm captions: SRT, WebVTT, SCC, MCC, EBU STL and TTML/IMSC1/DFXP import/export, caption layout and burn-in rasterisation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+novafilm-time = { workspace = true }
+novafilm-color = { workspace = true }
+novafilm-project = { workspace = true }
+novafilm-text = { workspace = true }
+thiserror = { workspace = true }
+roxmltree = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
