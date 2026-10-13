@@ -191,8 +191,8 @@ impl MediaSource for Encoded {
             .flat_map(|p| {
                 let lin = [0, 1, 2].map(|k| novafilm_color::srgb_to_linear(p[k] as f32 / 255.0) * self.gain);
                 let c = novafilm_color::spaces::apply3(&m, lin);
-                let e = c
-                    .map(|v| (novafilm_color::transform::encode_channel(v as f64, curve, novafilm_color::Range::Full).clamp(0.0, 1.0) * 255.0).round() as u8);
+                let e =
+                    c.map(|v| (novafilm_color::transform::encode_channel(v as f64, curve, novafilm_color::Range::Full).clamp(0.0, 1.0) * 255.0).round() as u8);
                 [e[0], e[1], e[2], p[3]]
             })
             .collect();

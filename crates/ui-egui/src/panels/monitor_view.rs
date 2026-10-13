@@ -601,16 +601,7 @@ pub fn guides(app: &mut NovafilmApp, ui: &mut egui::Ui, w: Which, area: Rect, pi
 /// The Source Monitor's audio waveform (Audio Waveform display mode, audio-only clips and the
 /// split view): click to move the source playhead.
 #[allow(clippy::too_many_arguments)]
-pub fn waveform(
-    app: &mut NovafilmApp,
-    ui: &mut egui::Ui,
-    area: Rect,
-    item: ItemId,
-    time: Tick,
-    duration: Tick,
-    mark_in: Option<Tick>,
-    mark_out: Option<Tick>,
-) {
+pub fn waveform(app: &mut NovafilmApp, ui: &mut egui::Ui, area: Rect, item: ItemId, time: Tick, duration: Tick, mark_in: Option<Tick>, mark_out: Option<Tick>) {
     let t = app.tokens;
     let p = ui.painter().with_clip_rect(area);
     p.rect_filled(area, 0.0, t.monitor_bg);

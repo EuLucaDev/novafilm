@@ -19,11 +19,11 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use novafilm_frame::{AudioBuffer, VideoFrame};
-use novafilm_time::{FrameRate, TICKS_PER_SECOND, Tick};
 use image::codecs::gif::GifDecoder;
 use image::codecs::png::PngDecoder;
 use image::{AnimationDecoder, Delay, Frames, ImageDecoder, Limits};
+use novafilm_frame::{AudioBuffer, VideoFrame};
+use novafilm_time::{FrameRate, TICKS_PER_SECOND, Tick};
 
 use crate::{FrameRequest, MediaError, MediaInfo, MediaKind, MediaSource, Result, VideoStreamInfo};
 

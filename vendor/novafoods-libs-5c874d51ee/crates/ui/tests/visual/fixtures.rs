@@ -1,10 +1,10 @@
 //! Independent, font-free reference painting for the shared controls' public visual contracts.
 //! Reference paths never call nova-ui or derive their expected rectangles from its responses.
 
+use egui::{Align, Color32, CornerRadius, Id, Layout, Painter, Rect, Response, Stroke, StrokeKind, Ui, UiBuilder, Vec2, pos2, vec2};
 use nova_ui::buttons::{ButtonVisuals, IconButton, IconButtonStyle};
 use nova_ui::layout::{ResizeHandle, ResizeHandleStyle, SplitAxis, SplitSize, split_rect};
 use nova_ui::tabs::Tab;
-use egui::{Align, Color32, CornerRadius, Id, Layout, Painter, Rect, Response, Stroke, StrokeKind, Ui, UiBuilder, Vec2, pos2, vec2};
 
 pub const CANVAS: Vec2 = vec2(128.0, 72.0);
 pub const GAP: f32 = 8.0;

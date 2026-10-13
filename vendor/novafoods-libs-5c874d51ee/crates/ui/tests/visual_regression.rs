@@ -237,9 +237,9 @@ fn visual_comparisons_detect_color_spacing_and_stroke_mutations() {
 
 #[test]
 fn toolbar_fitting_matches_literal_group_and_overflow_positions() {
+    use egui::{Align, Layout, Stroke, StrokeKind, UiBuilder, pos2, vec2};
     use nova_ui::buttons::IconButton;
     use nova_ui::layout::fit_toolbar;
-    use egui::{Align, Layout, Stroke, StrokeKind, UiBuilder, pos2, vec2};
 
     let mut renderer = WgpuTestRenderer::new();
     let mut artifacts = Artifacts::new("toolbar");
@@ -292,8 +292,8 @@ fn toolbar_fitting_matches_literal_group_and_overflow_positions() {
 
 #[test]
 fn widget_palette_renders_all_five_states_with_existing_borders_and_expansion() {
-    use nova_ui::theme::WidgetPalette;
     use egui::{CornerRadius, Stroke, StrokeKind, pos2, vec2};
+    use nova_ui::theme::WidgetPalette;
 
     let mut renderer = WgpuTestRenderer::new();
     let mut artifacts = Artifacts::new("widget-palette");
@@ -353,11 +353,11 @@ fn widget_palette_renders_all_five_states_with_existing_borders_and_expansion() 
 
 #[test]
 fn svg_preparation_matches_literal_raster_references_at_all_scales() {
-    use nova_ui::icons::{SvgIconSet, SvgStyle};
     use egui::{
         ImageSource,
         load::{Bytes, ImagePoll, SizeHint},
     };
+    use nova_ui::icons::{SvgIconSet, SvgStyle};
 
     const SOURCE: &[u8] = br#"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16"/><path d="M4 4L20 20"/></svg>"#;
     const LIGHT: &[u8] = br##"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.75"><rect x="4" y="4" width="16" height="16"/><path d="M4 4L20 20"/></svg>"##;

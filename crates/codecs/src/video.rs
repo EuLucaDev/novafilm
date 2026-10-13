@@ -836,12 +836,7 @@ pub fn apv_to_video_frame(f: novafilm_apv::Frame) -> VideoFrame {
         let to8 = |p: Vec<u16>| Arc::new(p.into_iter().map(|v| v as u8).collect::<Vec<u8>>());
         novafilm_frame::PixelData::Yuv8 { planes: [to8(f.y), to8(cb), to8(cr)], chroma, alpha: f.alpha.map(to8) }
     } else {
-        novafilm_frame::PixelData::Yuv16 {
-            planes: [Arc::new(f.y), Arc::new(cb), Arc::new(cr)],
-            chroma,
-            bits: f.bit_depth as u32,
-            alpha: f.alpha.map(Arc::new),
-        }
+        novafilm_frame::PixelData::Yuv16 { planes: [Arc::new(f.y), Arc::new(cb), Arc::new(cr)], chroma, bits: f.bit_depth as u32, alpha: f.alpha.map(Arc::new) }
     };
     VideoFrame { width: f.width, height: f.height, data, color, par: (1, 1), pts: novafilm_time::Tick::ZERO }
 }

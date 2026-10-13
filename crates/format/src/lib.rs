@@ -390,12 +390,8 @@ mod tests {
         use novafilm_time::{FrameRate, Tick, TimeRange};
         let mut p = Project::new("Legacy");
         let rate = FrameRate::FPS_24;
-        let layer = p.add_item(
-            "Layer",
-            novafilm_project::Label::Iris,
-            ItemKind::AdjustmentLayer { width: 1920, height: 1080, rate, duration: rate.tick_of(48) },
-            None,
-        );
+        let layer =
+            p.add_item("Layer", novafilm_project::Label::Iris, ItemKind::AdjustmentLayer { width: 1920, height: 1080, rate, duration: rate.tick_of(48) }, None);
         let settings = SequenceSettings { width: 15360, height: 8640, ..Default::default() };
         let seq = p.new_sequence("Sequence 01", settings, 1, 1, None);
         let range = TimeRange::new(Tick::ZERO, rate.tick_of(48));

@@ -544,9 +544,8 @@ struct GraphState {
 }
 
 fn build_state(plan: &Plan, sr: u32) -> GraphState {
-    let mk = |v: &[Insert], w: usize| -> Vec<Box<dyn AudioEffect>> {
-        v.iter().filter_map(|i| novafilm_audio_dsp::create_effect(i.map.dsp, sr as f32, w)).collect()
-    };
+    let mk =
+        |v: &[Insert], w: usize| -> Vec<Box<dyn AudioEffect>> { v.iter().filter_map(|i| novafilm_audio_dsp::create_effect(i.map.dsp, sr as f32, w)).collect() };
     let mut strips: Vec<StripState> = plan
         .strips
         .iter()

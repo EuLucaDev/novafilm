@@ -607,11 +607,7 @@ mod tests {
         let b = project.add_item(
             "B",
             novafilm_project::Label::Iris,
-            ItemKind::Subclip {
-                parent: a,
-                range: novafilm_time::TimeRange::new(novafilm_time::Tick::ZERO, novafilm_time::Tick(1000)),
-                restrict_trims: false,
-            },
+            ItemKind::Subclip { parent: a, range: novafilm_time::TimeRange::new(novafilm_time::Tick::ZERO, novafilm_time::Tick(1000)), restrict_trims: false },
             None,
         );
         let pool = MediaPool::default();
@@ -680,9 +676,8 @@ mod tests {
     /// item says why; decodable frames, damaged ones and the sound are left alone.
     #[test]
     fn undecodable_frames_show_the_unreadable_slate() {
-        let info = GeneratorSource::new(novafilm_media::Generator::ColorMatte { color: [0.0; 4] }, 16, 8, Default::default(), novafilm_time::Tick(100))
-            .info()
-            .clone();
+        let info =
+            GeneratorSource::new(novafilm_media::Generator::ColorMatte { color: [0.0; 4] }, 16, 8, Default::default(), novafilm_time::Tick(100)).info().clone();
         let pool = MediaPool::default();
         let item = ItemId(1);
         pool.insert_file(item, "/media/cam/a.mov", Arc::new(PartlyDecodable(info)));
@@ -739,9 +734,8 @@ mod tests {
     }
 
     fn flaky() -> (MediaPool, ItemId, Arc<Flaky>) {
-        let info = GeneratorSource::new(novafilm_media::Generator::ColorMatte { color: [0.0; 4] }, 16, 8, Default::default(), novafilm_time::Tick(100))
-            .info()
-            .clone();
+        let info =
+            GeneratorSource::new(novafilm_media::Generator::ColorMatte { color: [0.0; 4] }, 16, 8, Default::default(), novafilm_time::Tick(100)).info().clone();
         (MediaPool::default(), ItemId(1), Arc::new(Flaky(info, Default::default())))
     }
 

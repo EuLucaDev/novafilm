@@ -1,7 +1,7 @@
 //! Nova Film's panel chrome and document tabs over the shared docking transactions.
 
-use nova_ui::docking::{Action, DropTarget, Placement, Zone, resolve_drop};
 use egui::{Color32, Rect, Sense, Stroke, StrokeKind, pos2, vec2};
+use nova_ui::docking::{Action, DropTarget, Placement, Zone, resolve_drop};
 use serde_json::{Value, json};
 
 use crate::dock::{self, DockAction, DockNode, Group, PanelKind};

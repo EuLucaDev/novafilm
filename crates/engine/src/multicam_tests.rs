@@ -564,9 +564,8 @@ fn any_nest_can_be_multicam() {
     let rate = FrameRate::FPS_24;
     let nest = p.new_sequence("Nest", novafilm_project::SequenceSettings { width: W, height: H, frame_rate: rate, ..Default::default() }, 2, 0, None);
     for (k, it) in items[..2].iter().enumerate() {
-        let mut v = p
-            .make_track_item(*it, novafilm_project::TrackKind::Video, Tick::ZERO, novafilm_time::TimeRange::new(Tick::ZERO, rate.tick_of(48)), rate)
-            .unwrap();
+        let mut v =
+            p.make_track_item(*it, novafilm_project::TrackKind::Video, Tick::ZERO, novafilm_time::TimeRange::new(Tick::ZERO, rate.tick_of(48)), rate).unwrap();
         for e in &mut v.effects {
             novafilm_project::resolve_auto_points(e, (W, H), (W, H));
         }

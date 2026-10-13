@@ -173,13 +173,8 @@ mod tests {
     /// fixture-free project helper).
     fn project(transform: bool) -> (Arc<Project>, ItemId, SourceMap) {
         let mut p = Project::new("x");
-        let g = GeneratorSource::new(
-            Generator::ColorMatte { color: [0.2, 0.5, 0.9, 1.0] },
-            320,
-            180,
-            novafilm_time::FrameRate::FPS_24,
-            Tick(2 * TICKS_PER_SECOND),
-        );
+        let g =
+            GeneratorSource::new(Generator::ColorMatte { color: [0.2, 0.5, 0.9, 1.0] }, 320, 180, novafilm_time::FrameRate::FPS_24, Tick(2 * TICKS_PER_SECOND));
         let tone = GeneratorSource::new(Generator::Tone { hz: 440.0, db: -6.0 }, 320, 180, novafilm_time::FrameRate::FPS_24, Tick(2 * TICKS_PER_SECOND));
         let add = |p: &mut Project, g: &GeneratorSource| {
             let info = g.info().clone();

@@ -115,8 +115,7 @@ fn opacity_and_blend_mode_mix_over_the_original() {
     // Multiply: red × cyan = black at 100 %
     let op = clip(&mut s, adj).effect_mut("opacity").unwrap();
     op.params.get_mut("opacity").unwrap().value = ParamValue::Float(100.0);
-    op.params.get_mut("blend").unwrap().value =
-        ParamValue::Choice(novafilm_project::effect::BLEND_MODES.iter().position(|b| *b == "Multiply").unwrap() as u32);
+    op.params.get_mut("blend").unwrap().value = ParamValue::Choice(novafilm_project::effect::BLEND_MODES.iter().position(|b| *b == "Multiply").unwrap() as u32);
     let c = render(&s).get(100, 100);
     assert!(near(c, [0.0, 0.0, 0.0], 1e-3), "{c:?}");
 }
@@ -293,8 +292,7 @@ fn a_dissolve_on_an_adjustment_layer_keeps_its_opacity_and_blend_mode() {
     // Multiply (red × cyan = black) fades from red to black
     let op = clip(&mut s, adj).effect_mut("opacity").unwrap();
     op.params.get_mut("opacity").unwrap().value = ParamValue::Float(100.0);
-    op.params.get_mut("blend").unwrap().value =
-        ParamValue::Choice(novafilm_project::effect::BLEND_MODES.iter().position(|b| *b == "Multiply").unwrap() as u32);
+    op.params.get_mut("blend").unwrap().value = ParamValue::Choice(novafilm_project::effect::BLEND_MODES.iter().position(|b| *b == "Multiply").unwrap() as u32);
     assert!(near(at(&s, 6), [0.5, 0.0, 0.0], 1e-3), "{:?}", at(&s, 6));
     assert!(near(at(&s, 24), [0.0, 0.0, 0.0], 1e-3), "{:?}", at(&s, 24));
 }

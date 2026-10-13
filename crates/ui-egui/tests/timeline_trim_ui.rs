@@ -344,8 +344,8 @@ fn an_edge_dragged_past_the_media_stops_at_its_end() {
     let (_, x1, y) = d.edges(last);
     let (_, e0) = d.span(last);
     let far = novafilm_time::Tick(3600 * novafilm_time::TICKS_PER_SECOND);
-    let limit = novafilm_engine::commands::trim_delta(&d.app().session, ClipId(last), novafilm_edit::Edge::Out, novafilm_edit::TrimMode::Regular, far)
-        .expect("limit");
+    let limit =
+        novafilm_engine::commands::trim_delta(&d.app().session, ClipId(last), novafilm_edit::Edge::Out, novafilm_edit::TrimMode::Regular, far).expect("limit");
     let (from, to) = (pos2(x1 - 3.0, y), pos2(x1 + 300.0, y));
     let push = |d: &mut Driver, e: egui::Event| d.harness.input_mut().events.push(e);
     push(&mut d, egui::Event::PointerMoved(from));

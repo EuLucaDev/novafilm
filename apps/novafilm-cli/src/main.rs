@@ -61,7 +61,7 @@ fn stdout_failed(e: std::io::Error) {
 }
 
 const HELP: &str = "\
-novafilm-cli: drive NovaFilm from the shell (headless engine, or the live app with --bridge)
+novafilm-cli: drive Nova Film from the shell (headless engine, or the live app with --bridge)
 
 USAGE
   novafilm-cli [OPTIONS] <SUBCOMMAND> [ARGS]

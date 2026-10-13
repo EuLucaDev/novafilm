@@ -26,7 +26,7 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 
-use crate::{NovafilmApp, HostHooks, RelinkHint};
+use crate::{HostHooks, NovafilmApp, RelinkHint};
 
 /// A native file dialog. Filters are a name and extensions without dots.
 #[derive(Clone, Debug)]

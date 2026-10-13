@@ -3,12 +3,12 @@
 
 use std::{collections::BTreeMap, path::PathBuf};
 
+use egui::{Color32, Context, Event, FullOutput, Id, Modifiers, PointerButton, Pos2, RawInput, Rect, Stroke, pos2, vec2};
+use egui_kittest::{TestRenderer, wgpu::WgpuTestRenderer};
 use nova_ui::{
     docking::{Action, DockArea, DockStyle, Floating, Layout, Node, Permissions},
     layout::{SplitAxis, SplitSize},
 };
-use egui::{Color32, Context, Event, FullOutput, Id, Modifiers, PointerButton, Pos2, RawInput, Rect, Stroke, pos2, vec2};
-use egui_kittest::{TestRenderer, wgpu::WgpuTestRenderer};
 
 const CANVAS: u32 = 0;
 const LAYERS: u32 = 1;

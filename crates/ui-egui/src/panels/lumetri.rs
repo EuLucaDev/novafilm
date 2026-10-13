@@ -272,15 +272,7 @@ pub fn show(app: &mut NovafilmApp, ui: &mut egui::Ui, rect: Rect) {
     }
 }
 
-fn open_section(
-    ui: &mut egui::Ui,
-    app: &mut NovafilmApp,
-    e: &EffectInstance,
-    name: &str,
-    param: &str,
-    sec: &'static str,
-    out: &mut Vec<&'static str>,
-) -> bool {
+fn open_section(ui: &mut egui::Ui, app: &mut NovafilmApp, e: &EffectInstance, name: &str, param: &str, sec: &'static str, out: &mut Vec<&'static str>) -> bool {
     let on = e.param(param).and_then(|p| p.value.as_bool()).unwrap_or(param != "hsl_on");
     let (open, toggled) = section(ui, app, name, on);
     if toggled {

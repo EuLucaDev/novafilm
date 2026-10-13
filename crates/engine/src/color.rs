@@ -306,14 +306,14 @@ fn interpret(s: &mut Session, p: &Value) -> Result<Value> {
         Some("auto") | Some("") => Some(None),
         Some(c) => Some(Some(ColorSpace::parse(c).ok_or_else(|| bad(CMD, format!("unknown colour space `{c}`")))?)),
     };
-    let par =
-        match p.get("pixelAspect") {
-            None | Some(Value::Null) => None,
-            Some(Value::String(f)) if f == "file" || f == "auto" => Some(None),
-            Some(v) => Some(Some(pixel_aspect_p(v).ok_or_else(|| {
-                bad(CMD, format!("pixelAspect must be [num, den] between 1:{0} and {0}:1, or \"file\"", novafilm_project::MAX_PIXEL_ASPECT))
-            })?)),
-        };
+    let par = match p.get("pixelAspect") {
+        None | Some(Value::Null) => None,
+        Some(Value::String(f)) if f == "file" || f == "auto" => Some(None),
+        Some(v) => Some(Some(
+            pixel_aspect_p(v)
+                .ok_or_else(|| bad(CMD, format!("pixelAspect must be [num, den] between 1:{0} and {0}:1, or \"file\"", novafilm_project::MAX_PIXEL_ASPECT)))?,
+        )),
+    };
     if cs.is_none() && par.is_none() {
         return Err(bad(CMD, "need `colorSpace` (auto or a colour space id) or `pixelAspect`"));
     }
@@ -457,8 +457,7 @@ fn apply_match(s: &mut Session, p: &Value) -> Result<Value> {
     }
     let provider = s.media.provider(s.project.clone(), s.services.clone());
     let opts = novafilm_render::RenderOptions { scale: 0.25, working_output: true, ..Default::default() };
-    let current =
-        novafilm_render::render_clip(&probe, seq_id, clip, t, opts, &provider).ok_or_else(|| bad("lumetri.applyMatch", "the clip has no picture"))?;
+    let current = novafilm_render::render_clip(&probe, seq_id, clip, t, opts, &provider).ok_or_else(|| bad("lumetri.applyMatch", "the clip has no picture"))?;
     let reference = novafilm_render::render_sequence(&s.project, seq_id, reference_t, opts, &provider);
     let m = novafilm_render::color_match::solve(&current, &reference, &base, skin);
     let v2 = |a: [f32; 2]| ParamValue::Vec2(novafilm_geom::Vec2::new(a[0] as f64, a[1] as f64));

@@ -1279,8 +1279,7 @@ fn automate_to_sequence(s: &mut Session, p: &Value) -> Result<Value> {
 /// the GPU adapter.
 pub fn system_report() -> Value {
     let cpus = std::thread::available_parallelism().map(|n| n.get()).unwrap_or(1);
-    let formats: Vec<Value> =
-        novafilm_export::Format::ALL.iter().map(|f| json!({"format": f.label(), "available": novafilm_export::available(*f)})).collect();
+    let formats: Vec<Value> = novafilm_export::Format::ALL.iter().map(|f| json!({"format": f.label(), "available": novafilm_export::available(*f)})).collect();
     json!({
         "app": format!("Nova Film {}", env!("CARGO_PKG_VERSION")),
         "os": std::env::consts::OS,

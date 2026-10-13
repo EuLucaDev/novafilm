@@ -555,11 +555,7 @@ fn import(s: &mut Session, p: &Value) -> Result<Value> {
 
 /// The project item that already references a file.
 pub fn item_for_path(s: &Session, path: &str) -> Option<ItemId> {
-    s.project
-        .items
-        .values()
-        .find(|i| i.as_media().is_some_and(|m| matches!(&m.media, novafilm_project::MediaRef::File { path: p } if p == path)))
-        .map(|i| i.id)
+    s.project.items.values().find(|i| i.as_media().is_some_and(|m| matches!(&m.media, novafilm_project::MediaRef::File { path: p } if p == path))).map(|i| i.id)
 }
 
 fn open_in_source(s: &mut Session, p: &Value) -> Result<Value> {

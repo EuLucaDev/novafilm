@@ -46,8 +46,7 @@ fn make_cut_movie(path: &Path, shots: &[(DemoScene, i64)], w: u32, h: u32) {
         sources.push((item, Arc::new(src)));
         at += dur;
     }
-    let settings =
-        novafilm_export::ExportSettings { format: novafilm_export::Format::ProRes, path: path.to_string_lossy().into_owned(), ..Default::default() };
+    let settings = novafilm_export::ExportSettings { format: novafilm_export::Format::ProRes, path: path.to_string_lossy().into_owned(), ..Default::default() };
     let provider = move |id: ItemId| sources.iter().find(|(i, _)| *i == id).map(|(_, s)| s.clone());
     novafilm_export::export(&Arc::new(p), seq, &settings, &provider, &Default::default()).unwrap();
 }

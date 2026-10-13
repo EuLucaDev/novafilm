@@ -219,8 +219,7 @@ fn sizes_that_are_not_multiples_of_the_coding_block_are_cropped_back() {
         let pictures = decode(&path);
         assert_eq!(pictures.len(), 12);
         assert!(pictures.iter().all(|f| (f.width, f.height) == (w, h)), "{w}x{h}: decoded {}x{}", pictures[0].width, pictures[0].height);
-        if let (Some(ffprobe), Some(ffmpeg)) = (novafilm_testkit::ffprobe_or_skip("nvenc hevc export"), novafilm_testkit::ffmpeg_or_skip("nvenc hevc export"))
-        {
+        if let (Some(ffprobe), Some(ffmpeg)) = (novafilm_testkit::ffprobe_or_skip("nvenc hevc export"), novafilm_testkit::ffmpeg_or_skip("nvenc hevc export")) {
             let v = probe(&ffprobe, &path);
             assert_eq!((v["width"].as_str(), v["height"].as_str()), (w.to_string().as_str(), h.to_string().as_str()), "{v:?}");
             assert_ffmpeg_decodes(&ffmpeg, &path);

@@ -970,8 +970,7 @@ pub fn search_bin_rows(
             }
         });
         if open {
-            let bin =
-                novafilm_project::Bin { id: sb.id, name: sb.name.clone(), children: matches.into_iter().map(novafilm_project::BinEntry::Item).collect() };
+            let bin = novafilm_project::Bin { id: sb.id, name: sb.name.clone(), children: matches.into_iter().map(novafilm_project::BinEntry::Item).collect() };
             draw_items(app, ui, &bin, row, actions);
         }
     }

@@ -149,16 +149,8 @@ impl AudioOut {
         let out_ch = if self.channels == 6 { 6 } else { 2 };
         let mut st = if real > 0 {
             let layout = novafilm_audio_dsp::channels::Layout::from_channels(out_ch);
-            novafilm_render::audio::mix_sequence_layout(
-                &self.project,
-                &self.seq,
-                pos,
-                real,
-                sources,
-                layout,
-                novafilm_audio_dsp::channels::Mixdown::FrontRear,
-            )
-            .channels
+            novafilm_render::audio::mix_sequence_layout(&self.project, &self.seq, pos, real, sources, layout, novafilm_audio_dsp::channels::Mixdown::FrontRear)
+                .channels
         } else {
             vec![Vec::new(); out_ch]
         };

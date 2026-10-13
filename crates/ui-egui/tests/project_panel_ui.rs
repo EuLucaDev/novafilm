@@ -509,8 +509,7 @@ fn a_dragged_bin_nests_in_another_and_back_out() {
     let inner = d.exec("file.newBin", json!({"name": "Inner"}))["bin"].as_u64().unwrap();
     d.app().ui.expanded_bins.clear();
     d.frames(3);
-    let parent =
-        |d: &mut Driver, b: u64| novafilm_ui_egui::panels::project::parent_bin(&d.app().session.project.root, novafilm_project::BinId(b)).map(|p| p.0);
+    let parent = |d: &mut Driver, b: u64| novafilm_ui_egui::panels::project::parent_bin(&d.app().session.project.root, novafilm_project::BinId(b)).map(|p| p.0);
     let root = d.app().session.project.root.id.0;
     let drag = |d: &mut Driver, from: [f32; 4], to: (f32, f32)| {
         let start = (from[0] + 80.0, from[1] + from[3] / 2.0);

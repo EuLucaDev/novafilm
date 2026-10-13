@@ -592,11 +592,7 @@ fn list(app: &mut NovafilmApp, ui: &mut egui::Ui, r: Rect, entries: &[Entry], co
 }
 
 /// A preview item for a file's thumbnail (files not in the project), or the project item.
-fn preview_item(
-    app: &mut NovafilmApp,
-    ctx: &egui::Context,
-    e: &Entry,
-) -> Option<(Arc<Project>, ItemId, novafilm_time::Tick, novafilm_time::FrameRate, u32)> {
+fn preview_item(app: &mut NovafilmApp, ctx: &egui::Context, e: &Entry) -> Option<(Arc<Project>, ItemId, novafilm_time::Tick, novafilm_time::FrameRate, u32)> {
     if let Some(i) = mb::item_for_path(&app.session, &e.path) {
         let it = app.session.project.item(i)?;
         let w = it.as_media()?.info.video.as_ref()?.width;
