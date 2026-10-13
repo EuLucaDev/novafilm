@@ -111,7 +111,7 @@ Set-Content -Encoding ascii -Path (Join-Path $Portable 'portable.txt') -Value @(
   'NovaFilm portable: preferences, presets, logs and crash recovery are kept in the data folder',
   'next to novafilm.exe. Delete this file to use %APPDATA%\NovaFilm instead.'
 )
-foreach ($f in 'README.md', 'LICENSE', 'LICENSE-MIT', 'LICENSE-APACHE') {
+foreach ($f in 'README.md', 'LICENSE', 'LICENSE-MIT', 'LICENSE-APACHE', 'NOTICE') {
   $p = Join-Path $Root $f
   if (Test-Path $p) { Copy-Item $p $Portable }
 }

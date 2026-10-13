@@ -9,13 +9,13 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package
       Name="NovaFilm"
-      Manufacturer="Learning Machines LLC"
+      Manufacturer="Nova Foods"
       Version="$(var.Version)"
-      UpgradeCode="31E6FB14-9DBC-41DD-B24B-26B71FB31B62"
+      UpgradeCode="6AD26212-A1D7-57B4-979E-2693092F6728"
       Scope="perMachine"
       Compressed="yes"
       Language="1033">
-    <SummaryInformation Description="NovaFilm video editor" Manufacturer="Learning Machines LLC" />
+    <SummaryInformation Description="NovaFilm video editor" Manufacturer="Nova Foods" />
     <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
          (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -40,7 +40,7 @@
 
   <Fragment>
     <ComponentGroup Id="NovafilmFiles" Directory="INSTALLFOLDER">
-      <Component Id="NovafilmApp" Guid="15933017-925B-4963-8992-52000EB26AAA">
+      <Component Id="NovafilmApp" Guid="9395EED1-DBF6-530B-91F2-480802AE9F9B">
         <File Id="NovafilmExe" Source="$(var.BinDir)\novafilm.exe" KeyPath="yes">
           <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="NovaFilm"
               Description="NovaFilm video editor" WorkingDirectory="INSTALLFOLDER" Advertise="yes"
@@ -52,6 +52,9 @@
 
       <Component Id="NovafilmCli">
         <File Id="NovafilmCliExe" Source="$(var.BinDir)\novafilm-cli.exe" KeyPath="yes" />
+      </Component>
+      <Component Id="NovaFoodsLegalNotice">
+        <File Id="NovaFoodsLegalNoticeFile" Source="$(sys.SOURCEFILEDIR)..\..\NOTICE" KeyPath="yes" />
       </Component>
     </ComponentGroup>
   </Fragment>

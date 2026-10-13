@@ -13,7 +13,7 @@ release: 1
 section: video
 priority: optional
 maintainer: ${NOVAFILM_MAINTAINER}
-vendor: Learning Machines LLC
+vendor: Nova Foods
 homepage: https://workflowind.agcunae.com/apps/novafilm
 license: MIT OR Apache-2.0
 description: |-
