@@ -60,4 +60,4 @@ serde_json = { workspace = true }
 toml = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "73c86a72931074d3a0b55997ac0d9dc64237cfa1" }
+nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "4bae300bfa60a31ef62f1d9f28a4cd067b46ed7c" }

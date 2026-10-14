@@ -3077,15 +3077,26 @@ checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
 [[package]]
 name = "nova-live"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=73c86a72931074d3a0b55997ac0d9dc64237cfa1#73c86a72931074d3a0b55997ac0d9dc64237cfa1"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=4bae300bfa60a31ef62f1d9f28a4cd067b46ed7c#4bae300bfa60a31ef62f1d9f28a4cd067b46ed7c"
 dependencies = [
  "base64 0.22.1",
  "getrandom 0.4.3",
+ "nova-live-macos",
  "rustls",
  "serde",
  "serde_json",
  "tungstenite",
  "webpki-roots",
+ "windows-registry",
+]
+
+[[package]]
+name = "nova-live-macos"
+version = "0.1.0"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=4bae300bfa60a31ef62f1d9f28a4cd067b46ed7c#4bae300bfa60a31ef62f1d9f28a4cd067b46ed7c"
+dependencies = [
+ "objc2 0.6.4",
+ "objc2-foundation 0.3.2",
 ]
 
 [[package]]
@@ -3098,7 +3109,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "arboard",
  "chrono",
@@ -3131,7 +3142,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-aac"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3141,7 +3152,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-ac3"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
  "thiserror 2.0.21",
@@ -3149,7 +3160,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-apv"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3159,14 +3170,14 @@ dependencies = [
 
 [[package]]
 name = "novafilm-audio-dsp"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
 ]
 
 [[package]]
 name = "novafilm-automation"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "base64 0.22.1",
  "image",
@@ -3182,7 +3193,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-av1"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3193,21 +3204,21 @@ dependencies = [
 
 [[package]]
 name = "novafilm-avi"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
 ]
 
 [[package]]
 name = "novafilm-bitstream"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "proptest",
 ]
 
 [[package]]
 name = "novafilm-captions"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-color",
  "novafilm-project",
@@ -3220,11 +3231,11 @@ dependencies = [
 
 [[package]]
 name = "novafilm-cfb"
-version = "0.8.0"
+version = "0.9.0"
 
 [[package]]
 name = "novafilm-cli"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-automation",
  "novafilm-codecs",
@@ -3246,7 +3257,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-codecs"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "log",
@@ -3284,7 +3295,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-color"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "proptest",
  "serde",
@@ -3292,7 +3303,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-dng"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-dng",
  "rayon",
@@ -3301,7 +3312,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-dnx"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3311,7 +3322,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-edit"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-geom",
  "novafilm-media",
@@ -3324,7 +3335,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-engine"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "log",
@@ -3358,7 +3369,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-export"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "novafilm-aac",
@@ -3389,7 +3400,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-flac"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3398,7 +3409,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-format"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "log",
  "novafilm-media",
@@ -3411,7 +3422,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-frame"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-color",
  "novafilm-time",
@@ -3421,7 +3432,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-geom"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "proptest",
  "serde",
@@ -3429,7 +3440,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-golden"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-color",
  "novafilm-frame",
@@ -3446,7 +3457,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-gpu"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "log",
@@ -3465,7 +3476,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-h264"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3475,7 +3486,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-h264enc"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3485,7 +3496,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-hevc"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3495,7 +3506,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-interchange"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-cfb",
  "novafilm-color",
@@ -3512,7 +3523,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-isobmff"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3523,7 +3534,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-matroska"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
  "serde_json",
@@ -3531,7 +3542,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-media"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "novafilm-color",
@@ -3547,7 +3558,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-mpa"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3556,7 +3567,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-mpeg2v"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
  "rayon",
@@ -3565,7 +3576,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-mpegts"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
  "thiserror 2.0.21",
@@ -3573,28 +3584,28 @@ dependencies = [
 
 [[package]]
 name = "novafilm-mxf"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
 ]
 
 [[package]]
 name = "novafilm-ogg"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
 ]
 
 [[package]]
 name = "novafilm-opus"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
 ]
 
 [[package]]
 name = "novafilm-platform"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "libloading",
  "log",
@@ -3620,7 +3631,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-project"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-color",
  "novafilm-geom",
@@ -3634,7 +3645,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-prores"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "novafilm-testkit",
@@ -3644,7 +3655,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-render"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "image",
  "novafilm-audio-dsp",
@@ -3664,7 +3675,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-scopes"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-color",
  "serde",
@@ -3673,7 +3684,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-speech"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -3691,14 +3702,14 @@ dependencies = [
 
 [[package]]
 name = "novafilm-testkit"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "png",
 ]
 
 [[package]]
 name = "novafilm-text"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "harfrust",
  "novafilm-color",
@@ -3710,7 +3721,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-time"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "proptest",
  "serde",
@@ -3718,7 +3729,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-tts"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "candle-core",
  "candle-nn",
@@ -3732,7 +3743,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-tts-text"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "serde",
  "thiserror 2.0.21",
@@ -3740,7 +3751,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-ui-egui"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "cpu-time",
  "eframe",
@@ -3780,14 +3791,14 @@ dependencies = [
 
 [[package]]
 name = "novafilm-vp8"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "novafilm-vp9"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-bitstream",
  "rayon",
@@ -3796,7 +3807,7 @@ dependencies = [
 
 [[package]]
 name = "novafilm-web"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "eframe",
  "egui",
@@ -7108,6 +7119,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "windows-registry"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "02752bf7fbdcce7f2a27a742f798510f3e5ad88dbe84871e5168e2120c3d5720"
+dependencies = [
+ "windows-link",
+ "windows-result 0.4.1",
+ "windows-strings",
+]
+
+[[package]]
 name = "windows-result"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7535,7 +7557,7 @@ checksum = "e450f9b2ed1dff33c94c12589a87338689467b9c4f5d8a5710bd09a847d2c8a7"
 
 [[package]]
 name = "xtask"
-version = "0.8.0"
+version = "0.9.0"
 dependencies = [
  "novafilm-testkit",
  "serde_json",

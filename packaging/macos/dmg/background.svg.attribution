@@ -1,8 +1,8 @@
 asset:        background.svg
 title:        Nova Film macOS DMG window background
-author:       @XusBadia
+author:       Nova Foods
 source:       original work
 license:      MIT OR Apache-2.0
 license-file: LICENSE-MIT, LICENSE-APACHE
-added:        2026-10-08 by @XusBadia
-notes:        Original work for this repository, derived from the Nova Film app icon (assets/app-icon/novafilm.svg, referenced via <image>, not copied). Text is outlined Inter / JetBrains Mono glyph paths. Used for the Finder window of the macOS DMG; packaging/macos/dmg/generate.py renders it to background.tiff. See packaging/macos/dmg/README.md.
+added:        2026-10-08 by Nova Foods
+notes:        Nova Foods DMG window background: app colour, with the Nova Foods logo (trademark, `docs/brand/LICENSE-brand.txt`), app name and install hint; text is outlined Montserrat (OFL) glyph paths. See packaging/macos/dmg/README.md.

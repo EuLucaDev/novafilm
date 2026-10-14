@@ -77,6 +77,8 @@ fn tell(text: &str, error: bool) {
 }
 
 fn main() -> eframe::Result {
+    #[cfg(not(target_arch = "wasm32"))]
+    novafilm_ui_egui::live_ui::install_link_handler();
     // First, so the panic hook and every start-up record are logged (`logging`).
     let logger = logging::install();
     // lossy, so a value that is not Unicode is reported like any other bad port instead of ignored

@@ -3,15 +3,20 @@
 //! - Comandos do diário viram [`LiveChange::Op`] com o estado de edição de quem editou
 //!   (sequência ativa, seleção, cursor), para o colega rodar o mesmo comando no mesmo lugar.
 //! - Qualquer outra mudança do projeto (desfazer, refazer, gestos) vira [`LiveChange::Replace`].
-//! - O estado de edição de cada pessoa continua dela. A mídia (arquivos de vídeo, áudio, imagem)
-//!   fica no computador de cada um: o projeto sincroniza a montagem; mídia que falta aparece offline.
+//! - O estado de edição de cada pessoa continua dela.
+//! - Mídias (vídeo, áudio, imagem): o projeto guarda o caminho de quem importou. Quem não tem o
+//!   arquivo recebe uma cópia pela sessão ([`Session::live_media_ready`]); o projeto continua
+//!   igual em todos e cada um lê a cópia local no lugar do caminho ([`MediaAliases`]).
 
-use std::sync::Arc;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
+use std::sync::{Arc, RwLock};
 
-use novafilm_project::Project;
+use novafilm_project::{MediaRef, Project};
 use serde_json::{Value, json};
 
-use crate::{EditorState, EngineError, Result, Session};
+use crate::{EditorState, EngineError, Result, Services, Session};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum LiveChange {
@@ -28,6 +33,69 @@ pub struct LiveState {
     pub(crate) seen: Option<Arc<Project>>,
     /// Comandos rodando agora (comandos que chamam comandos): só o de fora é replicado.
     pub(crate) depth: u32,
+    /// Mídias recebidas: caminho no projeto → cópia local (continua valendo depois da sessão).
+    pub aliases: MediaAliases,
+}
+
+/// Caminho de mídia do projeto → arquivo local recebido numa sessão.
+#[derive(Clone, Debug, Default)]
+pub struct MediaAliases(Arc<RwLock<HashMap<String, String>>>);
+
+impl MediaAliases {
+    pub fn get(&self, path: &str) -> Option<String> {
+        self.0.read().unwrap_or_else(|e| e.into_inner()).get(path).cloned()
+    }
+    pub fn set(&self, path: &str, local: &str) {
+        self.0.write().unwrap_or_else(|e| e.into_inner()).insert(path.to_string(), local.to_string());
+    }
+}
+
+/// Os serviços do app, lendo a cópia recebida no lugar do caminho do projeto.
+struct AliasServices {
+    inner: Arc<dyn Services>,
+    aliases: MediaAliases,
+}
+
+impl AliasServices {
+    fn map<'a>(&self, path: &'a str) -> Cow<'a, str> {
+        self.aliases.get(path).map_or(Cow::Borrowed(path), Cow::Owned)
+    }
+}
+
+impl Services for AliasServices {
+    fn read_file(&self, path: &str) -> std::io::Result<Vec<u8>> {
+        self.inner.read_file(&self.map(path))
+    }
+    fn write_file(&self, path: &str, data: &[u8]) -> std::io::Result<()> {
+        self.inner.write_file(path, data)
+    }
+    fn file_size(&self, path: &str) -> std::io::Result<u64> {
+        self.inner.file_size(&self.map(path))
+    }
+    fn read_range(&self, path: &str, offset: u64, len: usize) -> std::io::Result<Vec<u8>> {
+        self.inner.read_range(&self.map(path), offset, len)
+    }
+    fn reader(&self, path: &str) -> Option<std::io::Result<novafilm_media::SharedReader>> {
+        self.inner.reader(&self.map(path))
+    }
+    fn list_dir(&self, dir: &str) -> Option<std::io::Result<Vec<String>>> {
+        self.inner.list_dir(dir)
+    }
+    fn file_loader(&self) -> Option<novafilm_media::sequence::FrameLoader> {
+        self.inner.file_loader()
+    }
+    fn export_in_memory(&self) -> bool {
+        self.inner.export_in_memory()
+    }
+    fn list_entries(&self, dir: &str) -> Option<std::io::Result<Vec<crate::media_browser::DirEntry>>> {
+        self.inner.list_entries(dir)
+    }
+    fn volumes(&self) -> Vec<crate::media_browser::Volume> {
+        self.inner.volumes()
+    }
+    fn home_dir(&self) -> Option<String> {
+        self.inner.home_dir()
+    }
 }
 
 fn err(e: impl std::fmt::Display) -> EngineError {
@@ -51,12 +119,49 @@ fn remote_command_allowed(cmd: &str) -> bool {
 
 impl Session {
     pub fn live_start(&mut self) -> Result<()> {
-        self.live = LiveState { on: true, seen: Some(self.project.clone()), ..LiveState::default() };
+        let aliases = self.live.aliases.clone();
+        self.services = Arc::new(AliasServices { inner: self.services.clone(), aliases: aliases.clone() });
+        self.live = LiveState { on: true, seen: Some(self.project.clone()), aliases, ..LiveState::default() };
         Ok(())
     }
 
     pub fn live_stop(&mut self) {
-        self.live = LiveState::default();
+        let aliases = self.live.aliases.clone();
+        self.live = LiveState { aliases, ..LiveState::default() };
+    }
+
+    /// Arquivos de mídia que o projeto usa (mídia e proxy), pelo caminho guardado no projeto.
+    pub fn live_media(&self) -> Vec<String> {
+        let mut out: Vec<String> = Vec::new();
+        for item in self.project.items.values() {
+            let Some(m) = item.as_media() else { continue };
+            for r in std::iter::once(&m.media).chain(m.proxy.as_ref()) {
+                if let MediaRef::File { path } = r
+                    && !out.contains(path)
+                {
+                    out.push(path.clone());
+                }
+            }
+        }
+        out
+    }
+
+    /// A mídia existe aqui (no caminho ou como cópia recebida)?
+    pub fn live_media_available(&self, path: &str) -> bool {
+        self.services.file_size(path).is_ok()
+    }
+
+    /// O arquivo local da mídia, para enviar a um colega (só se estiver aqui).
+    pub fn live_media_file(&self, path: &str) -> Option<PathBuf> {
+        let local = self.live.aliases.get(path).unwrap_or_else(|| path.to_string());
+        Path::new(&local).is_file().then(|| PathBuf::from(local))
+    }
+
+    /// A mídia chegou: o projeto passa a ler `local` no lugar de `path`.
+    pub fn live_media_ready(&mut self, path: &str, local: &Path) {
+        self.live.aliases.set(path, &local.to_string_lossy());
+        // Fontes abertas (e o aviso de offline) são esquecidas: a próxima leitura usa a cópia.
+        self.media.clear();
     }
 
     pub fn live_active(&self) -> bool {
@@ -88,6 +193,10 @@ impl Session {
         self.project = Arc::new(p);
         self.revision += 1;
         self.live.seen = Some(self.project.clone());
+        // O desfazer guarda fotos do projeto: depois de uma alteração de colega, desfazer o passo
+        // anterior apagaria o trabalho dele. O histórico local recomeça daqui.
+        self.history.undo.clear();
+        self.history.redo.clear();
 
         Ok(())
     }
@@ -98,14 +207,14 @@ impl Session {
             return Err(err("comando não permitido na colaboração"));
         }
         let local = self.state.clone();
-        let undo_len = self.history.undo.len();
         if let Some(state) = ctx.get("state").and_then(|s| serde_json::from_value::<EditorState>(s.clone()).ok()) {
             self.state = state;
         }
         self.live.applying = true;
         let r = self.execute(cmd, params.clone());
         self.live.applying = false;
-        self.history.undo.truncate(undo_len);
+        self.history.undo.clear();
+        self.history.redo.clear();
         self.state = local;
         self.live.seen = Some(self.project.clone());
 
@@ -180,7 +289,8 @@ mod tests {
         a.execute("sequence.addTracks", json!({"audio": 1})).unwrap();
         sync(&mut a, &mut b);
         assert_eq!(a.live_digest().unwrap(), b.live_digest().unwrap());
-        assert_eq!(b.history.undo.len(), b_undo, "o desfazer de B não ganha os passos de A");
+        assert!(b.history.undo.is_empty(), "o desfazer de B não ganha os passos de A (e recomeça)");
+        let _ = b_undo;
 
         a.execute("edit.undo", json!({})).unwrap();
         sync(&mut a, &mut b);

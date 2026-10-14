@@ -1,44 +1,13 @@
-# macOS DMG window
+# Janela do instalador macOS (DMG)
 
-What Finder shows when the DMG opens: a 660 × 400 pt background with the app icon and the
-`Applications` link side by side. `package.sh` copies these files into the image; nothing here is
-generated at build time, so the DMG still builds with `hdiutil makehybrid` (no mounted device, no
-Finder scripting on CI, nothing extra installed in the signing job).
+`background.svg` é o fundo da janela do DMG da Nova Foods: cor do app, logo Nova Foods (marca
+registrada, termos em `docs/brand/LICENSE-brand.txt`), nome do app e a instrução de instalação. O
+texto é Montserrat (OFL) já convertido em contornos, então nenhuma fonte fica no repositório.
 
-| File | What |
-|---|---|
-| `background.svg` | Source of the background: the app icon (`assets/app-icon/novafilm.svg`, linked, not copied) cropped as a cover on the Nova Film colour field (`#8b5cf6`), Ink and Paper. Its text (Inter, JetBrains Mono) is outlined, so rendering it needs no fonts. No paper grain: noise doesn't compress, and this keeps `background.tiff` small. |
-| `background.tiff` | The background at 1x (660 × 400 px, 72 dpi) and 2x (1320 × 800 px, 144 dpi) in one HiDPI TIFF (16-colour palette, Deflate, sRGB). Goes to `.background/background.tiff`. |
-| `dmg-layout.DS_Store` | Finder's view settings for the volume: window size, icon size 128, Nova Film.app at (326, 205), `Applications` at (574, 205), and the background. Goes to `.DS_Store` in the image; named so it isn't mistaken for (or ignored like) a Finder-generated `.DS_Store`. |
-| `generate.py` | Writes `background.tiff` and `dmg-layout.DS_Store` from the SVG and the layout above. |
+`generate.py` desenha o `background.tiff` (1x e 2x) e o `dmg-layout.DS_Store` (tamanho da janela,
+posição dos ícones) a partir dele:
 
-## The volume name has no version
+    pip install 'pillow>=12' ds_store==1.3.3 mac_alias==2.2.3
+    python3 packaging/macos/dmg/generate.py      # precisa do resvg no PATH
 
-The mounted volume is called `Nova Film`, not `Nova Film <version>`. The layout points at the background
-through an alias that includes the volume name, and Finder resolves it by that name: with a
-versioned name the window keeps its size and icon positions but shows no background (tested).
-The DMG file name (`novafilm-<version>-macos-<arch>.dmg`) still carries the version.
-
-## Rules
-
-- **Finder draws the icon labels in black in light and dark mode** when a window has a background,
-  so the area under both icons stays light (Paper).
-- **Nothing goes inside the icon boxes:** artwork keeps 10 pt clear of each 128 pt icon box and of
-  the label strip under it.
-
-## Regenerate
-
-Edit `background.svg` (or the layout constants in `generate.py`), then run, on any OS:
-
-```sh
-pip install 'pillow>=12' ds_store==1.3.3 mac_alias==2.2.3
-python3 packaging/macos/dmg/generate.py   # needs resvg on PATH
-```
-
-Both outputs are byte-for-byte reproducible and carry nothing from the machine that ran it: the
-SVG renders without any fonts, and `dmg-layout.DS_Store` is written from scratch, its background
-alias holding only the volume name and `/.background/background.tiff`. If you add text to the SVG,
-outline it (`usvg` from resvg converts text to paths). The window is 660 × 432 with Finder's 32 pt
-title bar; the content area is 660 × 400.
-
-This follows Nova Vector's `packaging/macos/dmg/` (EuLucaDev/novavector#493).
+O app fica em (326, 205) e o atalho Aplicativos em (574, 205); a seta do fundo fica entre os dois.

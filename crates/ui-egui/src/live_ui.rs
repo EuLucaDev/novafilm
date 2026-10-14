@@ -20,6 +20,8 @@ pub struct LiveUi {
     pub notice: Option<String>,
     /// Convite recebido pela linha de comando (`--join <link>`), aberto no primeiro quadro.
     pub pending_join: Option<String>,
+    /// Já pediu ao sistema para acordar a janela quando um convite chegar.
+    waker_set: bool,
 }
 
 impl LiveUi {
@@ -100,6 +102,23 @@ pub fn stop(app: &mut NovafilmApp) {
     app.session.live_stop();
 }
 
+/// Anfitrião: encerra a sessão para todo mundo (sair sem encerrar é [`stop`]: outro assume).
+pub fn end_all(app: &mut NovafilmApp) {
+    if let Some(live) = app.live.live.as_mut() {
+        live.end();
+    }
+    stop(app);
+}
+
+/// Anfitrião: convite novo; o anterior deixa de valer para quem ainda não entrou.
+pub fn renew(app: &mut NovafilmApp) {
+    match app.live.live.as_mut().map(|l| l.renew_invite()) {
+        Some(Ok(_)) => toast(app, "Convite novo criado. O anterior não funciona mais."),
+        Some(Err(e)) => app.live.error = Some(e.to_string()),
+        None => {}
+    }
+}
+
 /// O motor visto pela sessão.
 struct Doc<'a>(&'a mut novafilm_engine::Session);
 
@@ -133,10 +152,33 @@ impl nova_live::Adapter for Doc<'_> {
     fn busy(&self) -> bool {
         self.0.live_busy()
     }
+    fn media(&mut self) -> Vec<String> {
+        self.0.live_media()
+    }
+    fn media_available(&mut self, key: &str) -> bool {
+        self.0.live_media_available(key)
+    }
+    fn media_open(&mut self, key: &str) -> Option<(Box<dyn std::io::Read + Send>, u64)> {
+        nova_live::media::open_file(&self.0.live_media_file(key)?)
+    }
+    fn media_ready(&mut self, key: &str, path: &std::path::Path) -> nova_live::Result<()> {
+        self.0.live_media_ready(key, path);
+        Ok(())
+    }
 }
 
 /// A cada quadro: envia o que mudou aqui e aplica o que veio dos colegas.
 pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
+    if !app.live.waker_set {
+        let wake = ctx.clone();
+        nova_live::links::set_waker(move || wake.request_repaint());
+        app.live.waker_set = true;
+    }
+    for link in nova_live::links::take() {
+        if nova_live::Invite::parse(&link).is_ok() {
+            app.live.pending_join = Some(link);
+        }
+    }
     if let Some(text) = app.live.pending_join.take() {
         app.live.open = true;
         join(app, &text);
@@ -157,6 +199,8 @@ pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
             Notice::Joined(name) => toast(app, format!("{name} entrou")),
             Notice::Left(name) => toast(app, format!("{name} saiu")),
             Notice::Problem(p) => toast(app, format!("Colaboração: {p}")),
+            Notice::Promoted => toast(app, "Quem convidou saiu. Agora você coordena esta sessão."),
+            Notice::MediaReady(name) => toast(app, format!("Mídia recebida: {name}")),
             Notice::Ended(reason) => {
                 toast(app, reason);
                 stop(app);
@@ -198,14 +242,30 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
                     ui.ctx().copy_text(link);
                     action = Some("copied");
                 }
+                if ui.add_enabled(!live.peers().is_empty(), egui::Button::new("Gerar convite novo")).on_hover_text("O convite anterior deixa de funcionar; quem já entrou continua").clicked() {
+                    action = Some("renew");
+                }
             }
             ui.add_space(8.0);
             ui.label(RichText::new(format!("Participantes agora ({})", app.live.peers.len())).strong());
             for p in &app.live.peers {
                 ui.label(format!("{}{}", p.name, if p.host { " · anfitrião" } else { "" }));
             }
+            for m in live.media_progress() {
+                let pct = if m.total > 0 { m.done * 100 / m.total } else { 100 };
+                ui.label(format!("{} {} · {pct}%", if m.incoming { "Recebendo" } else { "Enviando" }, m.name));
+            }
             ui.add_space(8.0);
-            if ui.button(if host { "Encerrar colaboração" } else { "Sair" }).clicked() {
+            if host {
+                ui.horizontal(|ui| {
+                    if ui.button("Encerrar para todos").on_hover_text("Fecha a sessão de todo mundo").clicked() {
+                        action = Some("end");
+                    }
+                    if ui.button("Sair (a sessão continua)").on_hover_text("Quem está aqui segue editando; a pessoa que entrou primeiro passa a coordenar").clicked() {
+                        action = Some("stop");
+                    }
+                });
+            } else if ui.button("Sair").clicked() {
                 action = Some("stop");
             }
         } else {
@@ -237,6 +297,8 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
             join(app, &text);
         }
         Some("stop") => stop(app),
+        Some("end") => end_all(app),
+        Some("renew") => renew(app),
         Some("copied") => toast(app, "Convite copiado"),
         _ => {}
     }
@@ -256,9 +318,60 @@ pub fn bar(app: &mut NovafilmApp, ui: &mut egui::Ui) {
 
 /// Keep private invitation tokens out of file-open paths and their diagnostic logs.
 pub fn is_invite_arg(arg: &str) -> bool {
-    arg == "--join" || arg.starts_with("novalive:") || arg.starts_with("https://workflowind.agcunae.com/apps/join#invite=")
+    arg == "--join" || nova_live::Invite::parse(arg).is_ok()
 }
 
 pub fn launch_invite() -> Option<String> {
     std::env::args_os().skip(1).filter_map(|arg| arg.into_string().ok()).find(|arg| arg != "--join" && is_invite_arg(arg))
+}
+
+/// Canal de controle (`--control`): `live.host`, `live.join {invite}`, `live.status`, `live.stop`.
+/// O canal é local e opcional; o convite devolvido é o mesmo que a janela Colaborar mostra.
+pub fn control(app: &mut NovafilmApp, method: &str, p: &serde_json::Value) -> Option<Result<serde_json::Value, String>> {
+    match method {
+        "live.host" => {
+            if !app.live.active() {
+                app.live.error = None;
+                host(app);
+            }
+        }
+        "live.join" => {
+            let Some(text) = p.get("invite").and_then(serde_json::Value::as_str) else {
+                return Some(Err("missing `invite`".into()));
+            };
+            app.live.error = None;
+            join(app, text);
+        }
+        "live.stop" => stop(app),
+        "live.end" => end_all(app),
+        "live.renew" => renew(app),
+        "live.status" => return Some(Ok(live_status(app))),
+        _ => return None,
+    }
+    match app.live.error.clone() {
+        Some(e) if !app.live.active() => Some(Err(e)),
+        _ => Some(Ok(live_status(app))),
+    }
+}
+
+fn live_status(app: &mut NovafilmApp) -> serde_json::Value {
+    // Impressão digital do documento compartilhado: igual nos dois lados = mesmo conteúdo.
+    let digest = if app.live.active() { nova_live::Adapter::digest(&mut Doc(&mut app.session)).ok() } else { None };
+    let live = app.live.live.as_ref();
+    let host = live.is_some_and(|l| l.role() == Role::Host);
+    serde_json::json!({
+        "active": live.is_some(),
+        "role": live.map(|_| if host { "host" } else { "guest" }),
+        "invite": live.filter(|_| host).map(|l| l.invite().to_share_link()),
+        "peers": app.live.peers.iter().map(|p| serde_json::json!({"name": p.name, "host": p.host})).collect::<Vec<_>>(),
+        "error": app.live.error,
+        "digest": digest.map(|d| format!("{d:016x}")),
+    })
+}
+
+/// Recebe os links de convite que o sistema entrega (macOS). Chame no início de `main`, antes
+/// de abrir a janela. Também faz deste app quem abre os links `<app>://` (Windows, Linux).
+pub fn install_link_handler() {
+    nova_live::links::install();
+    nova_live::links::register(APP);
 }
