@@ -81,7 +81,7 @@ fn main() -> eframe::Result {
     let logger = logging::install();
     // lossy, so a value that is not Unicode is reported like any other bad port instead of ignored
     let env_port = std::env::var_os("NOVAFILM_CONTROL_PORT").map(|p| p.to_string_lossy().into_owned());
-    let launch = match args::parse(env_port, std::env::args_os().skip(1)) {
+    let launch = match args::parse(env_port, std::env::args_os().skip(1).filter(|arg| !arg.to_str().is_some_and(novafilm_ui_egui::live_ui::is_invite_arg))) {
         Ok(Cli::Run(l)) => l,
         Ok(Cli::Help) => {
             tell(args::USAGE, false);
@@ -247,6 +247,7 @@ fn app_creator(launch: Launch, graphics: graphics::GraphicsStart, created: Arc<A
             }
         }
         let mut app = NovafilmApp::new(session);
+            app.live.pending_join = novafilm_ui_egui::live_ui::launch_invite();
         app.graphics_notice = notice;
         if recover == Some(false) {
             app.dialog = None;

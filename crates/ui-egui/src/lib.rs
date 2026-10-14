@@ -45,6 +45,8 @@ pub mod header;
 pub mod i18n;
 pub mod icons;
 pub mod links;
+#[cfg(not(target_arch = "wasm32"))]
+pub mod live_ui;
 pub mod menus;
 pub mod native_dialogs;
 pub mod panels;
@@ -272,6 +274,8 @@ pub(crate) const EXPORT_SAVE_DIALOGS: [(&str, &str, &str); 7] = [
 ];
 
 pub struct NovafilmApp {
+    #[cfg(not(target_arch = "wasm32"))]
+    pub live: live_ui::LiveUi,
     pub session: Session,
     pub ui: UiState,
     pub tokens: Tokens,
@@ -538,6 +542,8 @@ impl NovafilmApp {
             session.prefs_path.as_ref().and_then(|p| p.parent()).map(|d| dock::WorkspacePrefs::load(&d.join(dock::WORKSPACES_FILE))).unwrap_or_default();
         let language = i18n::Language::parse(&session.prefs.general.interface_language).unwrap_or_default();
         Self {
+            #[cfg(not(target_arch = "wasm32"))]
+            live: live_ui::LiveUi::default(),
             session,
             ui: UiState { language, ..UiState::default() },
             tokens: Tokens::for_kind(ThemeKind::Dark),
@@ -1719,6 +1725,12 @@ impl NovafilmApp {
             crash::injected_fault("injected UI fault");
         }
         let ctx = ui.ctx().clone();
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            live_ui::pump(self, &ctx);
+            live_ui::bar(self, ui);
+            live_ui::window(self, &ctx);
+        }
         self.auto.begin_frame();
         panels::metadata::follow_selection(self);
         self.frames.set_context(&ctx);

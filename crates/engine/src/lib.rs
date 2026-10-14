@@ -24,6 +24,7 @@ pub mod graphics;
 pub mod interchange;
 pub mod keyboard;
 mod keyframe_move;
+pub mod live;
 mod marker_export;
 pub mod masks;
 pub mod media_browser;
@@ -442,6 +443,8 @@ pub struct Session {
     pub browser: media_browser::BrowserState,
     /// Nesting depth of [`Session::execute`] (commands that run other commands).
     exec_depth: u32,
+    /// Colaboração em tempo real (Nova Live), ver `live`.
+    pub live: live::LiveState,
     /// Each media file's size and modification time when last seen (Settings ▸ Media ▸
     /// Automatically refresh growing files, [`media_watch`]).
     pub media_stamps: std::collections::HashMap<String, media_watch::Stamp>,
@@ -537,6 +540,7 @@ impl Session {
             log: Default::default(),
             browser: Default::default(),
             exec_depth: 0,
+            live: live::LiveState::default(),
             media_stamps: Default::default(),
             media_scan: None,
         }
@@ -701,6 +705,7 @@ impl Session {
             }
             return Err(e);
         }
+        let live_ctx = (self.exec_depth == 0 && self.live.on).then(|| live::context(&self.state));
         self.exec_depth += 1;
         // Last-resort guard: a panic in a command (a bug that escaped the never-crash rules)
         // becomes an error for the caller (UI, CLI, control channel, MCP) instead of taking the
@@ -723,6 +728,9 @@ impl Session {
         self.sync_persistence();
         // playback reads the newest snapshot (mixer moves, mutes… are heard while playing)
         self.previews.live.publish_project(self.project.clone());
+        if let Some(ctx) = live_ctx {
+            self.live_record(id, &params, r.is_ok() && spec.journal, ctx);
+        }
         if r.is_ok() && spec.journal {
             self.journal.push((id.to_string(), params));
             if self.journal.len() > 10_000 {
