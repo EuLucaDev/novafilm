@@ -32,6 +32,7 @@ pub struct LiveState {
     /// O projeto já informado à sessão (só muda de objeto quando o conteúdo muda).
     pub(crate) seen: Option<Arc<Project>>,
     /// Comandos rodando agora (comandos que chamam comandos): só o de fora é replicado.
+    #[allow(dead_code)]
     pub(crate) depth: u32,
     /// Mídias recebidas: caminho no projeto → cópia local (continua valendo depois da sessão).
     pub aliases: MediaAliases,

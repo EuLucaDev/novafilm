@@ -442,6 +442,33 @@ pub fn show(app: &mut NovafilmApp, ui: &mut egui::Ui, rect: Rect) {
     }
     let layout = Layout { content, ruler, rows: rows.clone(), pps, scroll, split_y };
     app.tl.layout = Some(layout.clone());
+    // Colaboração: o mouse vai como tempo (segundos) e trilha (+ posição dentro dela), e só aparece
+    // para quem está na mesma sequência.
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        let (l1, l2) = (layout.clone(), layout.clone());
+        // Trilhas de vídeo em 0.., de áudio em 1000..; a fração é a altura dentro da trilha.
+        let lane = |r: &Row| if r.kind == TrackKind::Video { 0.0 } else { 1000.0 } + r.index as f64;
+        app.live.view = Some(crate::live_ui::LiveView::new(
+            content,
+            format!("seq:{}", seq_id.0),
+            move |p| {
+                let t = l1.tick_at(p.x).seconds();
+                match l1.row_at(p.y) {
+                    Some(r) => (t, lane(r) + f64::from(((p.y - r.rect.min.y) / r.rect.height().max(1.0)).clamp(0.0, 0.999))),
+                    None => (t, -1.0),
+                }
+            },
+            move |x, y| {
+                let px = l2.x_of(novafilm_time::Tick::from_seconds_f64(x));
+                let row = l2.rows.iter().find(|r| (lane(r) - y.floor()).abs() < 0.5);
+                match row {
+                    Some(r) => pos2(px, r.rect.min.y + r.rect.height() * y.fract() as f32),
+                    None => pos2(px, f32::NAN),
+                }
+            },
+        ));
+    }
 
     // ---- backgrounds
     painter.rect_filled(Rect::from_min_max(pos2(content.min.x, content.min.y), content.max), 0.0, t.tl_bg);

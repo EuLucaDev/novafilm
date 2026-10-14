@@ -22,6 +22,66 @@ pub struct LiveUi {
     pub pending_join: Option<String>,
     /// Já pediu ao sistema para acordar a janela quando um convite chegar.
     waker_set: bool,
+    /// A área de trabalho do último quadro (para os mouses).
+    pub view: Option<LiveView>,
+}
+
+/// O que a área de trabalho mostrou no último quadro: onde fica na tela, em que "espaço" a pessoa
+/// está olhando (página, aba, sequência…) e como converter entre tela e documento. Cada app
+/// preenche ao desenhar a área de trabalho; os mouses dos colegas usam isso.
+pub struct LiveView {
+    pub rect: egui::Rect,
+    pub space: String,
+    to_doc: Box<dyn Fn(egui::Pos2) -> (f64, f64)>,
+    to_screen: Box<dyn Fn(f64, f64) -> egui::Pos2>,
+}
+
+impl LiveView {
+    pub fn new(
+        rect: egui::Rect,
+        space: impl Into<String>,
+        to_doc: impl Fn(egui::Pos2) -> (f64, f64) + 'static,
+        to_screen: impl Fn(f64, f64) -> egui::Pos2 + 'static,
+    ) -> Self {
+        LiveView { rect, space: space.into(), to_doc: Box::new(to_doc), to_screen: Box::new(to_screen) }
+    }
+}
+
+/// Onde está o mouse desta pessoa no documento (fora da área de trabalho: nada).
+fn my_cursor(app: &NovafilmApp, ctx: &Context) -> Option<(String, f64, f64)> {
+    let view = app.live.view.as_ref()?;
+    let p = ctx.input(|i| if i.pointer.has_pointer() { i.pointer.latest_pos() } else { None })?;
+    if !view.rect.contains(p) {
+        return None;
+    }
+    let (x, y) = (view.to_doc)(p);
+    Some((view.space.clone(), x, y))
+}
+
+/// Os mouses dos colegas: seta e etiqueta com o nome, na cor de cada um.
+fn paint_cursors(app: &NovafilmApp, ctx: &Context) {
+    let (Some(live), Some(view)) = (app.live.live.as_ref(), app.live.view.as_ref()) else { return };
+    let cursors = live.cursors();
+    if cursors.is_empty() {
+        return;
+    }
+    let painter = ctx.layer_painter(egui::LayerId::new(egui::Order::Foreground, egui::Id::new("nova-live-cursors"))).with_clip_rect(view.rect);
+    for c in cursors.iter().filter(|c| c.space == view.space) {
+        let p = (view.to_screen)(c.x, c.y);
+        if !view.rect.expand(4.0).contains(p) {
+            continue;
+        }
+        let color = egui::Color32::from_rgb(c.color[0], c.color[1], c.color[2]);
+        // Seta do mouse (contorno branco para aparecer em qualquer fundo).
+        let arrow = [p, p + egui::vec2(0.0, 17.0), p + egui::vec2(4.6, 13.0), p + egui::vec2(11.5, 12.2)];
+        painter.add(egui::Shape::convex_polygon(arrow.to_vec(), color, egui::Stroke::new(1.5, egui::Color32::WHITE)));
+        // Etiqueta com o nome.
+        let galley = painter.layout_no_wrap(c.name.clone(), egui::FontId::proportional(12.0), egui::Color32::WHITE);
+        let at = p + egui::vec2(10.0, 16.0);
+        let rect = egui::Rect::from_min_size(at, galley.size() + egui::vec2(12.0, 6.0));
+        painter.rect_filled(rect, 4.0, color);
+        painter.galley(at + egui::vec2(6.0, 3.0), galley, egui::Color32::WHITE);
+    }
 }
 
 impl LiveUi {
@@ -31,7 +91,7 @@ impl LiveUi {
 }
 
 fn my_name() -> String {
-    std::env::var("NOVA_FOODS_NAME").or_else(|_| std::env::var("USER")).or_else(|_| std::env::var("USERNAME")).unwrap_or_else(|_| "Nova Foods".into())
+    nova_live::account::display_name()
 }
 
 fn toast(app: &mut NovafilmApp, msg: impl Into<String>) {
@@ -59,6 +119,9 @@ pub fn host(app: &mut NovafilmApp) {
 
 /// Entra num documento compartilhado pelo convite (link do app ou da página de convite).
 pub fn join(app: &mut NovafilmApp, text: &str) {
+    if let Some(name) = nova_live::account::name_from_invite(text) {
+        let _ = nova_live::account::save_account_name(&name);
+    }
     let invite = match Invite::parse(text) {
         Ok(i) => i,
         Err(e) => {
@@ -175,6 +238,14 @@ pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
         app.live.waker_set = true;
     }
     for link in nova_live::links::take() {
+        if let Some(name) = nova_live::account::parse_account_link(&link, APP) {
+            match nova_live::account::save_account_name(&name) {
+                Ok(name) => toast(app, format!("Conectado à conta Nova Foods como {name}")),
+                Err(e) => app.live.error = Some(e.to_string()),
+            }
+            app.live.open = true;
+            continue;
+        }
         if nova_live::Invite::parse(&link).is_ok() {
             app.live.pending_join = Some(link);
         }
@@ -191,7 +262,9 @@ pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
         app.live.error = Some("A colaboração terminou porque o arquivo compartilhado foi fechado ou substituído.".into());
         return;
     }
+    let cursor = my_cursor(app, ctx);
     let Some(live) = app.live.live.as_mut() else { return };
+    live.set_cursor(cursor);
     let notices = live.pump(&mut Doc(&mut app.session));
     app.live.peers = live.peers().to_vec();
     for n in notices {
@@ -208,6 +281,9 @@ pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
             }
         }
     }
+    paint_cursors(app, ctx);
+    // A área de trabalho preenche de novo ao desenhar este quadro (se aparecer).
+    app.live.view = None;
     ctx.request_repaint_after(std::time::Duration::from_millis(50));
 }
 
@@ -227,6 +303,20 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
     let mut open = true;
     let mut action: Option<&'static str> = None;
     egui::Window::new("Colaborar").open(&mut open).collapsible(false).resizable(false).default_width(420.0).show(ctx, |ui| {
+        match nova_live::account::account_name() {
+            Some(name) => {
+                ui.label(RichText::new(format!("Você aparece como {name} (conta Nova Foods)")).weak());
+            }
+            None => {
+                ui.horizontal(|ui| {
+                    ui.label(RichText::new(format!("Você aparece como {}", my_name())).weak());
+                    if ui.link("Usar minha conta Nova Foods").clicked() {
+                        ui.ctx().open_url(egui::OpenUrl::new_tab(nova_live::account::connect_url(APP)));
+                    }
+                });
+            }
+        }
+        ui.add_space(6.0);
         if let Some(live) = app.live.live.as_ref() {
             let host = live.role() == Role::Host;
             ui.label(RichText::new(if host { "Você está compartilhando este projeto." } else { "Você está em um projeto compartilhado." }).strong());
@@ -366,6 +456,12 @@ fn live_status(app: &mut NovafilmApp) -> serde_json::Value {
         "peers": app.live.peers.iter().map(|p| serde_json::json!({"name": p.name, "host": p.host})).collect::<Vec<_>>(),
         "error": app.live.error,
         "digest": digest.map(|d| format!("{d:016x}")),
+        "cursors": live.map(|l| {
+            l.cursors()
+                .iter()
+                .map(|c| serde_json::json!({"name": c.name, "space": c.space, "x": c.x, "y": c.y}))
+                .collect::<Vec<_>>()
+        }),
     })
 }
 
