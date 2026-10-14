@@ -1138,8 +1138,8 @@ fn build() -> Vec<CommandSpec> {
         // ================= File =================
         cmd!("file.newProject", "Project…", ["File", "New"], Some("Cmd+Alt+N"), r#"{"name":str}"#, always, |s, p| {
             let name = str_p(p, "name").unwrap_or("Untitled").to_string();
-    s.live.on = false;
-    s.live.outbox.clear();
+            s.live.on = false;
+            s.live.outbox.clear();
             s.project = std::sync::Arc::new(novafilm_project::Project::new(&name));
             s.history = Default::default();
             s.history.limit = 200;
@@ -1154,8 +1154,8 @@ fn build() -> Vec<CommandSpec> {
         }),
         cmd!("file.openDemoProject", "Demo Project", ["File", "New"], None, "{}", always, |s, _| {
             let (p, seq) = crate::demo::demo_project(&s.media);
-    s.live.on = false;
-    s.live.outbox.clear();
+            s.live.on = false;
+            s.live.outbox.clear();
             s.project = std::sync::Arc::new(p);
             s.history = Default::default();
             s.history.limit = 200;

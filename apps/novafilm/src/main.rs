@@ -247,7 +247,7 @@ fn app_creator(launch: Launch, graphics: graphics::GraphicsStart, created: Arc<A
             }
         }
         let mut app = NovafilmApp::new(session);
-            app.live.pending_join = novafilm_ui_egui::live_ui::launch_invite();
+        app.live.pending_join = novafilm_ui_egui::live_ui::launch_invite();
         app.graphics_notice = notice;
         if recover == Some(false) {
             app.dialog = None;
