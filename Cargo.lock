@@ -3242,7 +3242,7 @@ checksum = "2bf50223579dc7cdcfb3bfcacf7069ff68243f8c363f62ffa99cf000a6b9c451"
 [[package]]
 name = "nova-account-ui"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=b5c44c66604d6a6ea210d724c4f1de1bc2c5431b#b5c44c66604d6a6ea210d724c4f1de1bc2c5431b"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=ea81ea85a47e12da21d364911b7f168dab8c1c69#ea81ea85a47e12da21d364911b7f168dab8c1c69"
 dependencies = [
  "egui",
  "image",
@@ -3252,7 +3252,7 @@ dependencies = [
 [[package]]
 name = "nova-live"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=b5c44c66604d6a6ea210d724c4f1de1bc2c5431b#b5c44c66604d6a6ea210d724c4f1de1bc2c5431b"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=ea81ea85a47e12da21d364911b7f168dab8c1c69#ea81ea85a47e12da21d364911b7f168dab8c1c69"
 dependencies = [
  "base64 0.22.1",
  "getrandom 0.4.3",
@@ -3269,7 +3269,7 @@ dependencies = [
 [[package]]
 name = "nova-live-macos"
 version = "0.1.0"
-source = "git+https://github.com/EuLucaDev/nova-live?rev=b5c44c66604d6a6ea210d724c4f1de1bc2c5431b#b5c44c66604d6a6ea210d724c4f1de1bc2c5431b"
+source = "git+https://github.com/EuLucaDev/nova-live?rev=ea81ea85a47e12da21d364911b7f168dab8c1c69#ea81ea85a47e12da21d364911b7f168dab8c1c69"
 dependencies = [
  "objc2 0.6.4",
  "objc2-foundation 0.3.2",
