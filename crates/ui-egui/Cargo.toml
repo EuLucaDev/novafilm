@@ -11,7 +11,7 @@ workspace = true
 
 [dependencies]
 # Os 14 temas de interface da suíte Nova Foods (os do Nova Photo), em todos os alvos.
-nova-themes = { git = "https://github.com/EuLucaDev/nova-live", rev = "09fedc5f70f977109e5d76c4e89db37e0f54ee50", features = ["serde"] }
+nova-themes = { git = "https://github.com/EuLucaDev/nova-live", rev = "d0c50673eb1b525c3efbfda72e33bdeb4569e1e7", features = ["serde"] }
 nova-ui = { workspace = true }
 novafilm-time = { workspace = true }
 novafilm-geom = { workspace = true }
@@ -62,5 +62,5 @@ serde_json = { workspace = true }
 toml = "1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-nova-account-ui = { git = "https://github.com/EuLucaDev/nova-live", rev = "25720ad8a7aa8cc6e10ffd13091bd69873d9fd95" }
-nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "25720ad8a7aa8cc6e10ffd13091bd69873d9fd95" }
+nova-account-ui = { git = "https://github.com/EuLucaDev/nova-live", rev = "d0c50673eb1b525c3efbfda72e33bdeb4569e1e7" }
+nova-live = { git = "https://github.com/EuLucaDev/nova-live", rev = "d0c50673eb1b525c3efbfda72e33bdeb4569e1e7" }
