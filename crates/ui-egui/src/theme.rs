@@ -16,6 +16,8 @@ pub enum ThemeKind {
     /// Slightly lighter grey panels (Premiere's brightness slider mid position).
     Medium,
     Light,
+    /// One of the Nova Foods suite themes (Nova Photo's fourteen, from `nova-themes`).
+    Suite(nova_themes::ThemeKind),
 }
 
 impl ThemeKind {
@@ -25,13 +27,21 @@ impl ThemeKind {
             ThemeKind::Dark => "darkest",
             ThemeKind::Medium => "dark",
             ThemeKind::Light => "light",
+            ThemeKind::Suite(kind) => kind.id(),
         }
     }
     pub fn from_pref(s: &str) -> ThemeKind {
         match s {
             "dark" => ThemeKind::Medium,
             "light" => ThemeKind::Light,
-            _ => ThemeKind::Dark,
+            other => nova_themes::ThemeKind::from_name(other).map_or(ThemeKind::Dark, ThemeKind::Suite),
+        }
+    }
+    pub fn is_dark(self) -> bool {
+        match self {
+            ThemeKind::Dark | ThemeKind::Medium => true,
+            ThemeKind::Light => false,
+            ThemeKind::Suite(kind) => kind.is_dark(),
         }
     }
     pub fn from_name(s: &str) -> Option<ThemeKind> {
@@ -39,7 +49,7 @@ impl ThemeKind {
             "dark" | "darkest" => Some(ThemeKind::Dark),
             "medium" | "grey" | "gray" => Some(ThemeKind::Medium),
             "light" => Some(ThemeKind::Light),
-            _ => None,
+            _ => nova_themes::ThemeKind::from_name(s).map(ThemeKind::Suite),
         }
     }
 }
@@ -242,6 +252,7 @@ impl Tokens {
             tab_h: 32.0,
         };
         match kind {
+            ThemeKind::Suite(suite) => Tokens::for_suite(suite),
             ThemeKind::Dark => dark,
             ThemeKind::Medium => Tokens {
                 app_bg: Color32::from_rgb(20, 20, 20),
@@ -336,6 +347,45 @@ impl Tokens {
     /// Settings ▸ Appearance on top of a theme: the highlight colour (selections, primary buttons,
     /// the focus outline, the playhead, timecodes, drag values and track targeting) and accessible
     /// colour contrast (brighter secondary text and borders).
+    /// A suite theme paints the chrome (header, panels, tabs, fields, text, accent); the
+    /// timeline, monitors, meters and audio controls keep Nova Film's own colours.
+    pub fn for_suite(suite: nova_themes::ThemeKind) -> Self {
+        let p = suite.palette();
+        let base = Tokens::for_kind(if suite.is_dark() { ThemeKind::Dark } else { ThemeKind::Light });
+        let c = |x: nova_themes::Rgba| Color32::from_rgba_unmultiplied(x[0], x[1], x[2], x[3]);
+        Tokens {
+            kind: ThemeKind::Suite(suite),
+            app_bg: c(p.dock),
+            header_bg: c(p.chrome),
+            panel_bg: c(p.card),
+            tab_bg: c(p.tab_strip),
+            tab_text: c(p.text_dim),
+            tab_text_active: c(p.text),
+            focus: c(p.accent),
+            accent: c(p.accent),
+            accent_hover: c(nova_themes::mix(p.accent, [255, 255, 255, 255], 0.12)),
+            text: c(p.text),
+            text_dim: c(p.text_dim),
+            text_faint: c(p.text_faint),
+            icon: c(p.icon),
+            icon_active: c(p.text),
+            hover: c(p.hover),
+            pressed: c(p.pressed),
+            field_bg: c(p.field),
+            field_border: c(p.field_border),
+            separator: c(p.separator),
+            row_alt: c(nova_themes::mix(p.card, p.text, 0.03)),
+            row_selected: c(p.row_selected),
+            hot_text: c(p.accent),
+            pill_active_bg: c(p.pressed),
+            button_hover: c(p.hover),
+            button_border: c(p.field_border),
+            radius: p.radius,
+            radius_sm: p.radius_sm,
+            ..base
+        }
+    }
+
     pub fn with_appearance(mut self, highlight: Option<[u8; 3]>, accessible_contrast: bool) -> Self {
         if let Some([r, g, b]) = highlight {
             let c = Color32::from_rgb(r, g, b);

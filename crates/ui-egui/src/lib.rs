@@ -655,7 +655,7 @@ impl NovafilmApp {
         self.tokens = Tokens::for_kind(k).with_appearance(highlight, a.accessible_contrast);
         theme::apply_visuals(ctx, &self.tokens);
         self.apply_tooltips(ctx);
-        self.ui.dark = k != ThemeKind::Light;
+        self.ui.dark = k.is_dark();
     }
 
     /// The system appearance: the host's reading, else what the windowing toolkit reports.

@@ -10,6 +10,8 @@ rust-version.workspace = true
 workspace = true
 
 [dependencies]
+# Os 14 temas de interface da suíte Nova Foods (os do Nova Photo), em todos os alvos.
+nova-themes = { git = "https://github.com/EuLucaDev/nova-live", rev = "09fedc5f70f977109e5d76c4e89db37e0f54ee50", features = ["serde"] }
 nova-ui = { workspace = true }
 novafilm-time = { workspace = true }
 novafilm-geom = { workspace = true }
