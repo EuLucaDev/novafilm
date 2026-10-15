@@ -79,7 +79,7 @@ fn paint_cursors(app: &NovafilmApp, ctx: &Context) {
         let galley = painter.layout_no_wrap(c.name.clone(), egui::FontId::proportional(12.0), egui::Color32::WHITE);
         let at = p + egui::vec2(10.0, 16.0);
         let rect = egui::Rect::from_min_size(at, galley.size() + egui::vec2(12.0, 6.0));
-        painter.rect_filled(rect, 4.0, color);
+        painter.rect_filled(rect, 8.0, color);
         painter.galley(at + egui::vec2(6.0, 3.0), galley, egui::Color32::WHITE);
     }
 }
@@ -101,6 +101,10 @@ fn toast(app: &mut NovafilmApp, msg: impl Into<String>) {
 
 /// Começa a compartilhar o mesmo projeto ativo.
 pub fn host(app: &mut NovafilmApp) {
+    if !nova_live::identity::authorized(APP) {
+        app.live.error = Some("Conecte uma conta com acesso a este aplicativo.".into());
+        return;
+    }
     if app.session.live_start().is_err() {
         app.live.error = Some("Abra um projeto para colaborar.".into());
         return;
@@ -119,8 +123,9 @@ pub fn host(app: &mut NovafilmApp) {
 
 /// Entra num documento compartilhado pelo convite (link do app ou da página de convite).
 pub fn join(app: &mut NovafilmApp, text: &str) {
-    if let Some(name) = nova_live::account::name_from_invite(text) {
-        let _ = nova_live::account::save_account_name(&name);
+    if !nova_live::identity::authorized(APP) {
+        app.live.error = Some("Conecte uma conta com acesso a este aplicativo.".into());
+        return;
     }
     let invite = match Invite::parse(text) {
         Ok(i) => i,
@@ -289,8 +294,9 @@ pub fn pump(app: &mut NovafilmApp, ctx: &Context) {
 
 /// O botão da barra de título: "Colaborar" ou "Ao vivo · N".
 pub fn button(app: &mut NovafilmApp, ui: &mut egui::Ui) {
-    let label = if app.live.active() { format!("Ao vivo · {}", app.live.peers.len()) } else { "Colaborar".to_string() };
-    if ui.add(egui::Button::new(label)).on_hover_text("Editar ao vivo com outras pessoas").clicked() {
+    let people =
+        app.live.peers.iter().map(|p| nova_account_ui::Presence { user_id: p.user_id.clone(), name: p.name.clone(), host: p.host }).collect::<Vec<_>>();
+    if nova_account_ui::share_button(ui, &people, app.live.active()).clicked() {
         app.live.open = true;
     }
 }
@@ -302,20 +308,9 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
     }
     let mut open = true;
     let mut action: Option<&'static str> = None;
-    egui::Window::new("Colaborar").open(&mut open).collapsible(false).resizable(false).default_width(420.0).show(ctx, |ui| {
-        match nova_live::account::account_name() {
-            Some(name) => {
-                ui.label(RichText::new(format!("Você aparece como {name} (conta Nova Foods)")).weak());
-            }
-            None => {
-                ui.horizontal(|ui| {
-                    ui.label(RichText::new(format!("Você aparece como {}", my_name())).weak());
-                    if ui.link("Usar minha conta Nova Foods").clicked() {
-                        ui.ctx().open_url(egui::OpenUrl::new_tab(nova_live::account::connect_url(APP)));
-                    }
-                });
-            }
-        }
+    egui::Window::new("Compartilhar arquivo").open(&mut open).collapsible(false).resizable(false).default_width(400.0).show(ctx, |ui| {
+        nova_account_ui::account_panel(ui, APP);
+        ui.separator();
         ui.add_space(6.0);
         if let Some(live) = app.live.live.as_ref() {
             let host = live.role() == Role::Host;
@@ -339,7 +334,11 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
             ui.add_space(8.0);
             ui.label(RichText::new(format!("Participantes agora ({})", app.live.peers.len())).strong());
             for p in &app.live.peers {
-                ui.label(format!("{}{}", p.name, if p.host { " · anfitrião" } else { "" }));
+                ui.horizontal(|ui| {
+                    nova_account_ui::avatar(ui, p.user_id.as_deref(), &p.name, 32.0);
+                    ui.vertical(|ui| { ui.label(RichText::new(&p.name).strong()); ui.small(if p.host { "Anfitrião" } else { "Editando com você" }); });
+                });
+                ui.add_space(5.0);
             }
             for m in live.media_progress() {
                 let pct = if m.total > 0 { m.done * 100 / m.total } else { 100 };
@@ -361,7 +360,7 @@ pub fn window(app: &mut NovafilmApp, ctx: &Context) {
         } else {
             ui.label("Edite este projeto ao vivo com outras pessoas.");
             ui.add_space(4.0);
-            if ui.button("Convidar pessoas").clicked() {
+            if ui.add(egui::Button::new(RichText::new("Convidar pessoas").color(egui::Color32::WHITE)).fill(egui::Color32::from_rgb(0, 109, 255)).corner_radius(10).min_size(egui::vec2(170.0, 36.0))).clicked() {
                 action = Some("host");
             }
             ui.separator();

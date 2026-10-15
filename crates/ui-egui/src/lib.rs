@@ -29,6 +29,9 @@ macro_rules! tlf {
     };
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+pub use nova_account_ui as account_ui;
+
 pub mod automation;
 pub mod brand;
 pub mod calc;
@@ -2111,6 +2114,10 @@ impl eframe::App for NovafilmApp {
     }
 
     fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        #[cfg(not(target_arch = "wasm32"))]
+        if !crate::account_ui::gate(ui, "novafilm") {
+            return;
+        }
         if !self.fonts_ready {
             ui.ctx().request_repaint();
             return;
