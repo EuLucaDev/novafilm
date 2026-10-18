@@ -20,7 +20,7 @@ concurrency:
 jobs:
   release:
     # Intentionally tracked at @main (not SHA-pinned) so org-wide CI improvements, security fixes, and build optimizations propagate without PR churn across all craftapp repos.
-    uses: EuLucaDev/novafoods-actions/.github/workflows/release.yml@v2026.10.18
+    uses: EuLucaDev/novafoods-actions/.github/workflows/release.yml@v2026.10.18.1
     with:
       app-name: novafilm
       app-title: NovaFilm
